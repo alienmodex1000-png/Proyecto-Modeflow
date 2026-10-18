@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Credenciales de Sesión de WhatsApp (CRÍTICO: NUNCA SUBIR A GIT)
+auth_info/
+baileys_auth_info/
+
+# Datos Privados del Negocio y Sesiones de Clientes
+data/
+storage/
+settings.json
+sessions.json
+
+# Variables de Entorno y Claves de API
+.env
+.env.*
+*.env
+
+# Logs y Depuración
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del Sistema Operativo
+.DS_Store
+Thumbs.db

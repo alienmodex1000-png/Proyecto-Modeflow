@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModeFlow AI | Motor de Agendamiento WhatsApp 24/7</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="top-bar">
+    <div class="logo-badge">
+      <div class="logo-icon-box">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px;">ModeFlow AI</h3>
+          <span class="badge-tag"><i class="fa-solid fa-shield-halved"></i> Enterprise</span>
+        </div>
+        <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 1px;">by Mode Agency • Engine 24/7</p>
+      </div>
+    </div>
+
+    <div class="top-bar-actions">
+      <!-- Nombre de Empresa Actual -->
+      <div class="company-pill">
+        <i class="fa-solid fa-building" style="color: #38bdf8;"></i> 
+        <span id="navBusinessName">Mode Agency</span>
+      </div>
+
+      <!-- Botón Configuración / Cerebro -->
+      <button class="btn-secondary" id="btnOpenConfig">
+        <i class="fa-solid fa-sliders" style="color: #38bdf8;"></i> 
+        <span>Cerebro & Integraciones</span>
+      </button>
+
+      <!-- Botón Conexión WhatsApp Real -->
+      <button class="btn-whatsapp-top" id="btnOpenQRModal">
+        <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 1.1rem;"></i> 
+        <span>Vincular WhatsApp</span>
+        <span id="navWaStatusPill" class="badge-status-pill disconnected">Desconectado</span>
+      </button>
+
+      <!-- Live Cloud Badge -->
+      <span class="live-badge">
+        <span class="pulse-dot"></span> Cloud 24/7
+      </span>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-container">
+    
+    <!-- COLUMNA IZQUIERDA: SIMULADOR DE WHATSAPP SMARTPHONE -->
+    <section class="phone-wrapper">
+      <div class="phone-device">
+        <div class="phone-speaker"></div>
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="avatar" id="agentAvatar"><i class="fa-solid fa-brain"></i></div>
+          <div class="header-info">
+            <h4 id="agentHeaderTitle">Alien San • Mode Agency AI</h4>
+            <p id="agentStatusText"><span class="online-dot"></span> En línea 24/7 (Cloud Active)</p>
+          </div>
+          <!-- Human Handover Toggle -->
+          <div class="handover-toggle-wrapper" title="Permite al equipo humano pausar la IA y chatear manualmente">
+            <span id="lblHandover" style="font-size: 0.7rem; font-weight: 700; color: #25d366;"><i class="fa-solid fa-robot"></i> IA</span>
+            <label class="switch">
+              <input type="checkbox" id="chkHumanHandover" checked onchange="toggleHumanHandover()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Mensajes del Chat -->
+        <div class="chat-body" id="chatBody">
+          <div class="message incoming" id="welcomeMessage">
+            ¡Hola! Te damos la bienvenida a <strong>Mode Agency</strong> 🚀✨<br><br>
+            Soy el asistente inteligente de Alien San. Atiendo tus consultas 24/7 y puedo coordinar una <strong>Sesión Estratégica de Diagnóstico de 20 minutos por Google Meet</strong>.<br><br>
+            ¿En qué podemos apoyarte hoy? ¿Te gustaría automatizar las ventas de tu negocio o agendar una cita?
+            <span class="msg-time">08:00 AM</span>
+          </div>
+        </div>
+
+        <!-- Chips de Preguntas Rápidas (Scroll Horizontal Suave) -->
+        <div class="quick-prompts" id="quickPromptsContainer">
+          <button class="quick-chip" onclick="sendQuickPrompt('¿Cuánto cuesta el sistema de agendamiento?')">💰 Precios Mode Agency</button>
+          <button class="quick-chip" onclick="sendQuickPrompt('Quiero agendar para esta semana')">📅 Agendar Cita</button>
+          <button class="quick-chip" onclick="sendQuickPrompt('Viernes 10:30 AM')">⏰ Viernes 10:30 AM</button>
+          <button class="quick-chip" onclick="sendQuickPrompt('Soy un amigo de Alien')">👋 Soy amigo (Filtro Personal)</button>
+        </div>
+
+        <!-- Barra de Entrada de Chat -->
+        <div class="chat-input-bar">
+          <input type="text" id="chatInput" class="chat-input" placeholder="Escribe un mensaje de prueba...">
+          <button id="sendBtn" class="send-btn" title="Enviar Mensaje">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMNA DERECHA: DASHBOARD EJECUTIVO & PIPELINE HUB -->
+    <section class="dashboard-wrapper">
+      
+      <!-- Fila de Estadísticas -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Prospectos Calificados Hoy</div>
+          <div class="stat-value" id="statLeads">18</div>
+          <div class="stat-growth"><i class="fa-solid fa-arrow-trend-up"></i> +42% vs atención humana lenta</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-title">Citas Agendadas (Google Meet)</div>
+          <div class="stat-value" id="statAppointments" style="color: #25d366;">5</div>
+          <div class="stat-growth"><i class="fa-solid fa-calendar-check"></i> Sincronizado a Google Calendar</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-title">Pipeline Estimado en Negociación</div>
+          <div class="stat-value" id="statRevenue" style="color: #38bdf8;">$19.000.000 COP</div>
+          <div class="stat-growth"><i class="fa-solid fa-coins"></i> 5 Cierres Potenciales</div>
+        </div>
+      </div>
+
+      <!-- Panel Interactivo de Citas y Pipeline (Switcher de 3 Vistas) -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <div class="panel-title-left">
+            <h4><i class="fa-solid fa-chart-line" style="color: #25d366;"></i> Pipeline de Citas y Ventas</h4>
+            <p>Monitoreo inteligente de prospectos, agendas médicas y cierres en tiempo real.</p>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div class="view-switcher">
+              <button class="view-btn active" id="btnViewList" onclick="switchView('list')">
+                <i class="fa-solid fa-list"></i> Lista
+              </button>
+              <button class="view-btn" id="btnViewCalendar" onclick="switchView('calendar')">
+                <i class="fa-solid fa-calendar-days"></i> Calendario
+              </button>
+              <button class="view-btn" id="btnViewKanban" onclick="switchView('kanban')">
+                <i class="fa-solid fa-table-columns"></i> Pipeline CRM
+              </button>
+            </div>
+            <span class="live-badge"><span class="pulse-dot"></span> Sync Activo</span>
+          </div>
+        </div>
+
+        <!-- Vista 1: Lista Clásica de Citas -->
+        <div class="appointments-list" id="appointmentsList"></div>
+
+        <!-- Vista 2: Calendario Semanal Visual -->
+        <div class="calendar-grid" id="weeklyCalendarView" style="display: none;"></div>
+
+        <!-- Vista 3: Tablero Kanban CRM por Etapas -->
+        <div class="kanban-board" id="kanbanViewContainer" style="display: none;"></div>
+      </div>
+
+      <!-- Tarjeta de Monitoreo de WhatsApp Real (Baileys Live Pipeline) -->
+      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h5 style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> Sesiones Activas en WhatsApp Real (Servidor Cloud)
+            </h5>
+            <p style="font-size: 0.76rem; color: #94a3b8;">Números que han escrito recientemente a tu línea conectada.</p>
+          </div>
+          <button class="btn-secondary" onclick="fetchLivePipeline()" style="font-size: 0.78rem; padding: 6px 12px;">
+            <i class="fa-solid fa-rotate"></i> Actualizar Servidor
+          </button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid #475569; color: #94a3b8;">
+                <th style="padding: 8px 10px;">Teléfono</th>
+                <th style="padding: 8px 10px;">Clasificación</th>
+                <th style="padding: 8px 10px;">Etapa Bot</th>
+                <th style="padding: 8px 10px;">Horario Elegido</th>
+                <th style="padding: 8px 10px;">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="pipelineTableBody">
+              <tr style="border-bottom: 1px solid #334155;">
+                <td style="padding: 10px; font-weight: 600;">+57 320 653 3564</td>
+                <td><span class="badge-tag" style="background: rgba(37, 211, 102, 0.15); color: #25d366;">Cliente</span></td>
+                <td>WAITING_CONTACT_INFO</td>
+                <td>Viernes 10:30 AM</td>
+                <td><span class="status-badge status-confirmed">En Seguimiento</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Banner Comercial Inferior -->
+      <div class="pitch-banner">
+        <div class="pitch-text">
+          <h4>¿Cuánto dinero pierde un negocio en noches y fines de semana sin atender WhatsApp?</h4>
+          <p>ModeFlow AI responde en menos de 60 segundos, cualifica requerimientos y llena tu agenda automáticamente.</p>
+        </div>
+        <button class="btn-primary" onclick="openModal('clinicConfigModal')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Personalizar para Nuevo Cliente
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: DETALLE Y EDICIÓN DE CITA / PROSPECTO                   -->
+  <!-- ============================================================== -->
+  <div class="modal-overlay" id="appointmentModal">
+    <div class="modal-content" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-calendar-check" style="color: #25d366;"></i> Ficha de Cita / Prospecto</h3>
+        <button class="modal-close" onclick="closeModal('appointmentModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editApptIndex">
+        
+        <div class="form-group">
+          <label>Nombre Completo del Cliente / Paciente</label>
+          <input type="text" id="editPatientName">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>WhatsApp / Teléfono</label>
+            <input type="text" id="editPatientPhone">
+          </div>
+          <div class="form-group">
+            <label>Estado de la Cita</label>
+            <select id="editApptStatus">
+              <option value="confirmada">✅ Confirmada</option>
+              <option value="pendiente">⏳ Pendiente de Confirmación</option>
+              <option value="cancelada">❌ Cancelada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Servicio o Tratamiento Solicitado</label>
+          <input type="text" id="editPatientService">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Horario Asignado</label>
+            <input type="text" id="editPatientTime">
+          </div>
+          <div class="form-group">
+            <label>Valor Estimado (COP)</label>
+            <input type="number" id="editPatientPrice">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Notas de la Cita / Requerimientos</label>
+          <textarea id="editPatientNotes" rows="3" placeholder="Detalles de la consulta, requerimientos especiales..."></textarea>
+        </div>
+
+        <!-- Módulos de Alto Valor (Antideserción y Anticipo Wompi) -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn-secondary" style="background: #2563eb; color: white; border: none; font-size: 0.76rem;" onclick="triggerAntiNoShowReminder()">
+            <i class="fa-solid fa-bell"></i> Enviar Recordatorio Antideserción (24h)
+          </button>
+          <button type="button" class="btn-secondary" style="background: #7c3aed; color: white; border: none; font-size: 0.76rem;" onclick="generateWompiDepositLink()">
+            <i class="fa-solid fa-credit-card"></i> Generar Anticipo Wompi ($50.000 COP)
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-danger" id="btnDeleteAppt" onclick="deleteCurrentAppointment()">
+          <i class="fa-solid fa-trash"></i> Cancelar Cita
+        </button>
+        <div style="display: flex; gap: 10px;">
+          <a id="btnDirectWhatsApp" href="#" target="_blank" class="btn-secondary" style="background: #075e54; color: white; text-decoration: none;">
+            <i class="fa-brands fa-whatsapp"></i> Chatear
+          </a>
+          <button class="btn-primary" id="btnSaveAppt" onclick="saveAppointmentChanges()">
+            <i class="fa-solid fa-check"></i> Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CONFIGURADOR UNIVERSAL DEL NEGOCIO & BÓVEDA             -->
+  <!-- ============================================================== -->
+  <div class="modal-overlay" id="clinicConfigModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-sliders" style="color: #38bdf8;"></i> Configuración del Negocio & Bóveda de Integraciones</h3>
+        <button class="modal-close" onclick="closeModal('clinicConfigModal')">&times;</button>
+      </div>
+      
+      <!-- Pestañas fijas de navegación -->
+      <div class="config-tabs-nav">
+        <button type="button" class="config-tab-btn active" id="tabBtnBrain" onclick="switchConfigTab('tab-brain')">
+          <i class="fa-solid fa-brain"></i> 1. Cerebro & Servicios
+        </button>
+        <button type="button" class="config-tab-btn" id="tabBtnWompi" onclick="switchConfigTab('tab-wompi')">
+          <i class="fa-solid fa-credit-card"></i> 2. Pagos & Wompi (Anticipos)
+        </button>
+        <button type="button" class="config-tab-btn" id="tabBtnIntegrations" onclick="switchConfigTab('tab-integrations')">
+          <i class="fa-solid fa-calendar-check"></i> 3. Google Calendar & Alertas
+        </button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- PESTAÑA 1: CEREBRO Y SERVICIOS -->
+        <div class="config-tab-panel active" id="tab-brain">
+          
+          <!-- Plantillas Rápidas Opcionales -->
+          <div>
+            <label style="font-size: 0.74rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Cargar Plantilla de Ejemplo en 1 Clic:</label>
+            <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+              <button type="button" class="quick-chip" onclick="loadBusinessTemplate('dental')">🦷 Clínica Dental / Estética</button>
+              <button type="button" class="quick-chip" onclick="loadBusinessTemplate('agency')">🚀 Agencia IA / Mode Agency</button>
+              <button type="button" class="quick-chip" onclick="loadBusinessTemplate('realestate')">🏢 Inmobiliaria</button>
+              <button type="button" class="quick-chip" onclick="loadBusinessTemplate('legal')">⚖️ Asesoría Legal / Contable</button>
+              <button type="button" class="quick-chip" onclick="loadBusinessTemplate('custom')">✨ Nuevo Negocio desde Cero</button>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Nombre de la Empresa o Marca</label>
+              <input type="text" id="cfgClinicName" value="Mode Agency">
+            </div>
+            <div class="form-group">
+              <label>Giro / Industria del Negocio</label>
+              <input type="text" id="cfgIndustry" value="Automatización con Inteligencia Artificial & B2B">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Nombre y Rol del Asesor / Especialista / Doctor</label>
+              <input type="text" id="cfgDoctorName" value="Alien San • Director Estratégico">
+            </div>
+            <div class="form-group">
+              <label>Ubicación o Modalidad de Atención</label>
+              <input type="text" id="cfgClinicAddress" value="Google Meet (Virtual) / Sede Central">
+            </div>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+            <label style="font-size: 0.76rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+              <i class="fa-solid fa-calendar-check"></i> Parámetros de Disponibilidad del Calendario
+            </label>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label>Días de Atención</label>
+                <input type="text" id="cfgWorkDays" value="Lunes a Viernes">
+              </div>
+              <div class="form-group">
+                <label>Horario Laboral</label>
+                <input type="text" id="cfgWorkHours" value="09:00 AM - 07:00 PM">
+              </div>
+              <div class="form-group">
+                <label>Duración por Cita</label>
+                <input type="text" id="cfgSlotDuration" value="20 minutos">
+              </div>
+            </div>
+            
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+              <label style="font-size: 0.74rem; color: #f8fafc; font-weight: 700; display: block; margin-bottom: 4px;">
+                Filtro de Entrada de la Línea de WhatsApp:
+              </label>
+              <select id="cfgPersonalMode">
+                <option value="false">🏢 Línea 100% Comercial de la Empresa (Atender y vender directamente a todos)</option>
+                <option value="true">👤 Línea Personal Mixta (Preguntar si es amigo/familia antes de vender)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Catálogo de Servicios, Precios y Base de Conocimiento (FAQ)</label>
+            <textarea id="cfgServices" rows="4">1️⃣ Setup Sistema de Agendamiento WhatsApp IA 24/7: $3.800.000 COP
+2️⃣ Retainer Mensual de Servidores IA y Soporte: $1.200.000 COP/mes
+3️⃣ Auditoría de Embudo de Ventas: $1.500.000 COP</textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Objetivo y Tono del Agente Inteligente</label>
+            <input type="text" id="cfgGoal" value="Resolver dudas con calidez profesional, calificar el requerimiento del cliente y agendar la llamada estratégica de 20 minutos por Google Meet.">
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA 2: PAGOS & WOMPI (ANTICIPOS DE RESERVA) -->
+        <div class="config-tab-panel" id="tab-wompi">
+          
+          <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-left: 4px solid #10b981; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+            <strong style="color: #10b981;"><i class="fa-solid fa-shield-halved"></i> Seguridad Bancaria y Aislamiento de Fondos</strong><br>
+            Cada cliente vincula sus propias llaves de Wompi. Los pagos y anticipos entran <strong>directamente a la cuenta de Bancolombia / Nequi de su negocio</strong>. ModeFlow no retiene ni cobra comisión sobre el dinero recaudado.
+          </div>
+
+          <div class="integration-card">
+            <div class="integration-card-header">
+              <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-money-bill-wave" style="color: #10b981;"></i> Cobro de Anticipo Obligatorio para Reservas
+              </span>
+              <label class="switch">
+                <input type="checkbox" id="chkWompiEnabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 14px;">
+              Si está activo, la IA generará un link de pago seguro de Wompi y solo confirmará el espacio cuando el paciente pague el depósito.
+            </p>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Valor del Anticipo / Depósito (COP)</label>
+                <input type="number" id="cfgWompiDepositAmount" value="50000" placeholder="Ej: 50000">
+                <small style="font-size: 0.7rem; color: #64748b;">Monto deducible del valor total del servicio.</small>
+              </div>
+              <div class="form-group">
+                <label>Moneda de Cobro</label>
+                <input type="text" id="cfgWompiCurrency" value="COP" readonly style="background: #1e293b; color: #94a3b8;">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <label>Llave Pública de Wompi (Public Key)</label>
+              <input type="text" id="cfgWompiPublicKey" placeholder="pub_prod_... o pub_test_..." value="">
+              <small style="font-size: 0.7rem; color: #64748b;">La encuentras en el panel de Wompi > Desarrolladores > Llaves de API.</small>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <label>Secreto de Integridad de Wompi (Integrity Key)</label>
+              <input type="password" id="cfgWompiIntegrityKey" placeholder="prod_integrity_... o test_integrity_..." value="">
+              <small style="font-size: 0.7rem; color: #64748b;">Garantiza que nadie pueda alterar el monto del cobro.</small>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA 3: GOOGLE CALENDAR & ALERTAS -->
+        <div class="config-tab-panel" id="tab-integrations">
+          
+          <!-- Google Calendar -->
+          <div class="integration-card">
+            <div class="integration-card-header">
+              <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google Calendar (API FreeBusy)
+              </span>
+              <span class="status-badge status-confirmed">En Línea</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 12px;">
+              Sincroniza la agenda en tiempo real. Detecta automáticamente bloqueos personales del doctor para no sobreagendar citas encima.
+            </p>
+            <div class="form-group">
+              <label>ID o Correo de Google Calendar del Negocio</label>
+              <div style="display: flex; gap: 10px;">
+                <input type="text" id="cfgGoogleCalendarId" value="citas.doctor@gmail.com" placeholder="doctor@clinica.com">
+                <button type="button" class="btn-secondary" style="font-size: 0.78rem; padding: 8px 12px;" onclick="testCalendarSync()">
+                  <i class="fa-solid fa-rotate"></i> Test Sync
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alertas Instantáneas al Dueño / Doctor -->
+          <div class="integration-card">
+            <div class="integration-card-header">
+              <span style="font-size: 0.9rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-bell" style="color: #f59e0b;"></i> Alertas en Tiempo Real al Celular del Doctor / Dueño
+              </span>
+              <label class="switch">
+                <input type="checkbox" id="chkNotifyDoctor" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <p style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 12px;">
+              Cada vez que la IA cierre una cita o confirme un pago, le envía un mensaje instantáneo al celular personal del doctor o recepcionista.
+            </p>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>WhatsApp del Doctor / Recepcionista</label>
+                <input type="text" id="cfgDoctorAlertPhone" placeholder="Ej: 573001234567" value="">
+              </div>
+              <div class="form-group">
+                <label>Telegram Chat ID (Opcional)</label>
+                <input type="text" id="cfgDoctorTelegramId" placeholder="Ej: 123456789" value="">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('clinicConfigModal')">Cerrar</button>
+        <button class="btn-primary" id="btnSaveConfig" onclick="saveSettingsToCloud()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar y Activar en la IA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: PASARELA Y CONEXIÓN DE WHATSAPP REAL (CÓDIGO QR)        -->
+  <!-- ============================================================== -->
+  <div class="modal-overlay" id="whatsappQRModal">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3>
+          <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 1.5rem;"></i> 
+          Conexión de WhatsApp Real (ModeFlow Cloud)
+        </h3>
+        <button class="modal-close" onclick="closeModal('whatsappQRModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-left: 4px solid #25d366; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;">
+          <strong style="color: #25d366;"><i class="fa-solid fa-circle-info"></i> Conexión Segura con Servidor Cloud 24/7</strong><br>
+          Este código QR se genera directamente desde tu servidor. Al escanearlo, tu WhatsApp queda enlazado y responderá automáticamente aunque tu computador personal esté apagado.
+        </div>
+
+        <!-- VISTA DE ESCANEO QR -->
+        <div id="qrUnpairedView">
+          <div class="qr-modal-grid">
+            
+            <!-- Caja QR con Láser -->
+            <div class="qr-display-box">
+              <div class="qr-canvas-wrapper" id="qrCanvasWrapper">
+                <img id="liveQrImage" src="" alt="Cargando Código QR..." style="width: 190px; height: 190px; display: none; border-radius: 8px;">
+                <div id="qrLoadingSpinner" style="text-align: center; color: #94a3b8; font-size: 0.85rem;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: #25d366; margin-bottom: 10px;"></i><br>
+                  Generando QR en la nube...
+                </div>
+                <div class="qr-laser-line"></div>
+              </div>
+              <div style="margin-top: 12px; text-align: center; width: 100%;">
+                <span id="qrStatusBadge" style="font-size: 0.74rem; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.15); padding: 4px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                  <span class="pulse-dot" style="background: #ef4444; width: 6px; height: 6px;"></span> Esperando escaneo...
+                </span>
+                <button type="button" class="btn-secondary" style="font-size: 0.72rem; padding: 5px 10px; margin-top: 8px; display: block; width: 100%;" onclick="fetchLiveQR()">
+                  <i class="fa-solid fa-rotate"></i> Refrescar QR
+                </button>
+              </div>
+            </div>
+
+            <!-- Instrucciones de Vinculación Paso a Paso -->
+            <div>
+              <h4 style="font-size: 0.92rem; margin-bottom: 12px; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-mobile-screen-button" style="color: #38bdf8;"></i> Pasos para conectar en 10 segundos:
+              </h4>
+
+              <div class="qr-step-card">
+                <div class="qr-step-number">1</div>
+                <div class="qr-step-text">
+                  Abre <strong>WhatsApp</strong> (o WhatsApp Business) en tu celular.
+                </div>
+              </div>
+
+              <div class="qr-step-card">
+                <div class="qr-step-number">2</div>
+                <div class="qr-step-text">
+                  Toca <strong>Menú (⋮)</strong> en Android o <strong>Configuración</strong> en iPhone y entra a <strong>Dispositivos vinculados</strong>.
+                </div>
+              </div>
+
+              <div class="qr-step-card">
+                <div class="qr-step-number">3</div>
+                <div class="qr-step-text">
+                  Toca <strong>Vincular un dispositivo</strong> y apunta tu cámara hacia este código QR.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- VISTA DE WHATSAPP CONECTADO -->
+        <div id="qrConnectedView" style="display: none;">
+          <div class="qr-connected-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <span style="background: rgba(37, 211, 102, 0.2); color: #25d366; font-size: 0.74rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                  <span class="pulse-dot" style="background: #25d366; width: 8px; height: 8px;"></span> EN LÍNEA 24/7 EN RAILWAY CLOUD
+                </span>
+                <h3 id="displayConnectedNumber" style="font-size: 1.35rem; color: #f8fafc; margin-top: 8px; font-weight: 800;">
+                  +57 301 566 5588
+                </h3>
+                <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;">
+                  <i class="fa-solid fa-server" style="color: #38bdf8;"></i> Servidor: ModeFlow Cloud • Memoria Persistente: Activa
+                </p>
+              </div>
+              <button type="button" class="btn-danger" style="padding: 6px 14px; font-size: 0.78rem;" onclick="logoutWhatsApp()">
+                <i class="fa-solid fa-plug-circle-xmark"></i> Desvincular Teléfono
+              </button>
+            </div>
+
+            <div style="margin-top: 16px; padding: 14px; background: rgba(15, 23, 42, 0.7); border-radius: 8px; border: 1px solid #1e293b;">
+              <h5 style="color: #f8fafc; font-size: 0.82rem; margin-bottom: 8px;">
+                <i class="fa-solid fa-paper-plane" style="color: #25d366;"></i> Enlace directo para pacientes y clientes:
+              </h5>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a id="btnOpenDirectWaChat" href="#" target="_blank" class="btn-primary" style="text-decoration: none; font-size: 0.85rem; padding: 8px 16px;">
+                  <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Abrir Chat en WhatsApp
+                </a>
+                <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 8px 14px;" onclick="copyDirectWaLink()">
+                  <i class="fa-solid fa-copy"></i> Copiar Enlace
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('whatsappQRModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
