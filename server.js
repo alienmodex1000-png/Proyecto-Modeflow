@@ -5,6 +5,7 @@ const fs = require('fs');
 const QRCode = require('qrcode');
 const pino = require('pino');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } = require('@whiskeysockets/baileys');
+const { getServiceAccountCredentials, getBusySlots, scheduleGoogleMeeting } = require('./calendarService');
 
 // Cargar variables desde .env si existe (desarrollo local)
 const envFile = path.join(__dirname, '.env');
@@ -678,8 +679,8 @@ app.post('/api/simulate-chat', async (req, res) => {
   }
 });
 
-// Test y sincronización de Google Calendar (API FreeBusy)
-app.post('/api/calendar/test', (req, res) => {
+// Test y sincronización de Google Calendar (API FreeBusy & Service Account)
+app.post('/api/calendar/test', async (req, res) => {
   const settings = getSettings();
   const calId = req.body.calendarId || settings.integrations?.googleCalendarId || 'citas.doctor@gmail.com';
   
@@ -691,13 +692,21 @@ app.post('/api/calendar/test', (req, res) => {
     });
   }
 
+  const credentials = getServiceAccountCredentials();
+  const hasCreds = !!credentials;
+  const busy = await getBusySlots(calId);
+
   res.json({
     success: true,
     calendarId: calId,
+    hasServiceAccount: hasCreds,
+    robotEmail: credentials?.client_email || 'astra-bot@astra-revenue-systems.iam.gserviceaccount.com',
     status: 'ACTIVE',
-    mode: 'FREEBUSY_SYNC',
-    message: `¡Conexión verificada con ${calId}! Sincronización FreeBusy activa.`,
-    busyBlocksDetected: 3
+    mode: hasCreds ? 'GOOGLE_CALENDAR_LIVE' : 'FREEBUSY_CONFIGURED',
+    message: hasCreds
+      ? `¡Conexión verificada con ${calId}! Service Account (${credentials.client_email}) activa.`
+      : `Calendario verificado: ${calId}. Comparte tu calendario con astra-bot@astra-revenue-systems.iam.gserviceaccount.com y añade GOOGLE_SERVICE_ACCOUNT_KEY en Railway.`,
+    busyBlocksDetected: busy.length
   });
 });
 
